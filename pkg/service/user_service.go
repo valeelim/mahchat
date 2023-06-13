@@ -2,6 +2,7 @@ package service
 
 import (
 	"context"
+	"errors"
 	"time"
 
 	"github.com/gin-gonic/gin"
@@ -10,13 +11,6 @@ import (
 	"github.com/valeelim/mahchat/pkg/repository"
 	"github.com/valeelim/mahchat/pkg/utils"
 )
-
-type UserService struct {
-}
-
-func New() *UserService {
-	return new(UserService)
-}
 
 type RegisterUser func(c *gin.Context, req dto.RegisterRequest) (*dto.RegisterResponse, error)
 
@@ -27,9 +21,12 @@ type GetUsers func(c *gin.Context) (*dto.GetUsersResponse, error)
 func RegisterUserService(repo repository.User) RegisterUser {
 	return func(c *gin.Context, req dto.RegisterRequest) (*dto.RegisterResponse, error) {
 		if _, err := repo.GetUserByEmail(req.Email); err == nil {
+			return nil, errors.New("email already exists")
+		}
+		user, err := dao.NewUser(req.Email, req.Name)
+		if err != nil {
 			return nil, err
 		}
-		user := dao.NewUser(req.Email, req.Name)
 		if err := user.SetPassword(req.Password); err != nil {
 			return nil, err
 		}
@@ -38,7 +35,7 @@ func RegisterUserService(repo repository.User) RegisterUser {
 		}
 		return &dto.RegisterResponse{
 			Email: req.Email,
-			Name: req.Name,
+			Name:  req.Name,
 		}, nil
 	}
 }
@@ -60,14 +57,14 @@ func LoginUserService(repo repository.User, cache repository.Cache) LoginUser {
 		}
 
 		if err := cache.SetAccessToken(context.Background(), token, map[string]interface{}{
-			"user_id": user.ID,
+			"user_id":      user.ID,
 			"access_token": token,
-			"expires_at": time.Now().Add(1 * time.Hour).Unix(),
+			"expires_at":   time.Now().Add(1 * time.Hour).Unix(),
 		}); err != nil {
 			return nil, err
 		}
 		return &dto.LoginResponse{
-			UserId: user.ID,
+			UserId:      user.ID,
 			AccessToken: token,
 		}, nil
 	}

@@ -1,6 +1,8 @@
 package repository
 
-import "context"
+import (
+	"context"
+)
 
 type Cache interface {
 	GetAccessToken(ctx context.Context, key string) (map[string]string, error)

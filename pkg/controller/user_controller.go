@@ -9,53 +9,53 @@ import (
 )
 
 func (c *Controller) RegisterController(svc service.RegisterUser) gin.HandlerFunc {
-	return func(c *gin.Context) {
+	return func(ctx *gin.Context) {
 		var req dto.RegisterRequest
-		if err := c.BindJSON(&req); err != nil {
-			c.JSON(http.StatusBadRequest, gin.H{
+		if err := ctx.BindJSON(&req); err != nil {
+			ctx.JSON(http.StatusBadRequest, gin.H{
 				"error": err.Error(),
 			})
 			return
 		}
-		resp, err := svc(c, req)
+		resp, err := svc(ctx, req)
 		if err != nil {
-			c.JSON(http.StatusBadRequest, gin.H{
+			ctx.JSON(http.StatusBadRequest, gin.H{
 				"error": err.Error(),
 			})
 			return
 		}
-		c.JSON(http.StatusOK, resp)
+		ctx.JSON(http.StatusOK, resp)
 	}
 }
 
 func (c *Controller) LoginController(svc service.LoginUser) gin.HandlerFunc {
-	return func(c *gin.Context) {
+	return func(ctx *gin.Context) {
 		var req dto.LoginRequest
-		if err := c.BindJSON(&req); err != nil {
-			c.JSON(http.StatusBadRequest, gin.H{
+		if err := ctx.BindJSON(&req); err != nil {
+			ctx.JSON(http.StatusBadRequest, gin.H{
 				"error": err.Error(),
 			})
 			return
 		}
-		resp, err := svc(c, req)
+		resp, err := svc(ctx, req)
 		if err != nil {
-			c.JSON(http.StatusBadRequest, gin.H{
+			ctx.JSON(http.StatusBadRequest, gin.H{
 				"error": err.Error(),
 			})
 			return
 		}
-		c.JSON(http.StatusOK, resp)
+		ctx.JSON(http.StatusOK, resp)
 	}
 }
 
 func (c *Controller) GetAllUsersController(svc service.GetUsers) gin.HandlerFunc {
-	return func(c *gin.Context) {
-		resp, err := svc(c)
+	return func(ctx *gin.Context) {
+		resp, err := svc(ctx)
 		if err != nil {
-			c.JSON(http.StatusBadRequest, gin.H{
+			ctx.JSON(http.StatusBadRequest, gin.H{
 				"error": err.Error(),
 			})
 		}
-		c.JSON(http.StatusOK, resp)
+		ctx.JSON(http.StatusOK, resp)
 	}
 }

@@ -18,17 +18,17 @@ func (c *Conn) GetUserById(id string) (user dao.User, err error) {
 		FROM 
 			users
 		WHERE 
-			id = $1`, 
+			id = $1`,
 		id).Scan(&user.ID, &user.Email, &user.Name, &user.HashedPassword, &user.CreatedAt)
 	if err != sql.ErrNoRows {
-		err = errors.New("user not found") 
+		err = errors.New("user not found")
 	}
 	return
 }
 
 func (c *Conn) CreateUser(user *dao.User) error {
-	_, err := c.db.Exec(`INSERT INTO users (name, password, email) VALUES ($1, $2, $3)`,
-		user.Name, user.HashedPassword, user.Email)
+	_, err := c.db.Exec(`INSERT INTO users (id, name, password, email) VALUES ($1, $2, $3, $4)`,
+		user.ID, user.Name, user.HashedPassword, user.Email)
 	if err != nil {
 		return err
 	}
@@ -46,10 +46,10 @@ func (c *Conn) GetUserByEmail(email string) (user dao.User, err error) {
 		FROM 
 			users
 		WHERE 
-			email = $1`, 
+			email = $1`,
 		email).Scan(&user.ID, &user.Email, &user.Name, &user.HashedPassword, &user.CreatedAt)
 	if err == sql.ErrNoRows {
-		err = errors.New("user not found") 
+		err = errors.New("user not found")
 	}
 	return
 }
@@ -68,7 +68,7 @@ func (c *Conn) GetAllUsers() ([]dao.User, error) {
 		return nil, err
 	}
 	defer rows.Close()
-	
+
 	var result []dao.User
 	for rows.Next() {
 		var user dao.User

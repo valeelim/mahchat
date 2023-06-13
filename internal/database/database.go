@@ -3,7 +3,7 @@ package database
 import (
 	"database/sql"
 	"fmt"
-	"os"
+
 	_ "github.com/lib/pq"
 )
 
@@ -11,9 +11,9 @@ type Conn struct {
 	db *sql.DB
 }
 
-func New(user, port, password, dbname, host string) (*Conn, error) {
+func New(user, port, password, name, host string) (*Conn, error) {
 	connStr := fmt.Sprintf("user=%s port=%s password=%s dbname=%s host=%s sslmode=disable",
-		os.Getenv("DBUSER"), os.Getenv("DBPORT"), os.Getenv("DBPASS"), os.Getenv("DBNAME"), os.Getenv("DBHOST"))
+		user, port, password, name, host)
 	db, err := sql.Open("postgres", connStr)
 	if err != nil {
 		return nil, err
@@ -27,7 +27,5 @@ func New(user, port, password, dbname, host string) (*Conn, error) {
 }
 
 func (c *Conn) Close() error {
-	return c.db.Close()	
+	return c.db.Close()
 }
-
-
