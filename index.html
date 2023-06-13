@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Websocket test</title>
+</head>
+<body>
+   <h1>Send a message to us</h1>
+   <input type="text" id="message" placeholder="Enter a message">
+   <button type="submit" onclick="sendMessage()">Send</button>
+   <a href="room.html">go here</a>
+   <ul id="chat">
+   </ul>
+   <script>
+        var ws = new WebSocket("ws://localhost:8080/ws/channels/1668216063310958592")
+        ws.onopen = function(evt) {
+            console.log("Connection open...")
+        }
+        ws.onmessage = function(evt) {
+            console.log("Received Message from server: " + evt.data)
+            console.log(JSON.parse(evt.data))
+            appendChat(JSON.parse(evt.data).content)
+        }
+        ws.onclose = function(evt) {
+            console.log("Connection closed :(")
+        }
+        function sendMessage() {
+            console.log("message sent")
+            var data = {
+                content: document.getElementById("message").value
+            }
+            ws.send(JSON.stringify(data))
+        }
+        function appendChat(content) {
+            var ul = document.getElementById("chat") 
+            var li = document.createElement("li")
+            li.appendChild(document.createTextNode(content))
+            ul.appendChild(li)
+        }
+   </script>
+</body>
+</html>
